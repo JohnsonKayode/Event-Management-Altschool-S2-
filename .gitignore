@@ -1,0 +1,61 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+# Virtual environments
+env/
+venv/
+ENV/
+VENV/
+env.bak/
+venv.bak/
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+# Pytest cache
+.pytest_cache/
+# Coverage reports
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+*.coverage
+*.cover
+*.log
+nosetests.xml
+coverage.xml
+*.mo
+*.pot
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+# Pyre type checker
+.pyre/
+# Pylint
+pylint-report.txt
+pylint-output.txt
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+# MacOS system files
+.DS_Store
