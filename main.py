@@ -1,9 +1,11 @@
 from fastapi import FastAPI
+from routers.speaker_router import speaker_router
 
 
 app = FastAPI()
 
-# app.include_router(routername) This is to import routers into the main file
+app.include_router(speaker_router, prefix="/speaker") 
+# This is to import routers into the main file
 
 
 @app.get("/")
