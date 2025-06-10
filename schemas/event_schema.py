@@ -7,3 +7,4 @@ class Event(BaseModel):
     location: str
     date: Annotated[Union[str, int], "Date can be a string or an integer"] = 0
     is_open: bool = True
+

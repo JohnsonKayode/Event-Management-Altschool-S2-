@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from database import speaker_db
-from schemas.speaker_schema import Create_speaker
+from schemas.speaker_schema import Create_speaker, Update_speaker
 
 
 speaker_router = APIRouter()
@@ -20,3 +20,25 @@ def create_speaker(created_speaker: Create_speaker):
         'Message': 'Speaker successfully Created' ,
         'Details': details}
 
+
+@speaker_router.put("/speaker/{id}")
+def update_speaker(id: int, update_a_speaker_details: Update_speaker):
+    if id in speaker_db:
+        details = speaker_db[id] = update_a_speaker_details.model_dump()
+        return {
+            'Message': 'Details Updated sucessfully',
+            "details" : details
+        }
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Speaker not found")
+
+
+
+@speaker_router.delete("/speaker/{id}")
+def del_speaker(id: int):
+    if id in speaker_db:
+       del_speaker = speaker_db.pop(id)
+       return {
+           'message' : "Speaker Deleted ssucessfully", 
+           'detailss' : del_speaker
+       }
+    return f"speaker not found", status.HTTP_404_NOT_FOUND
