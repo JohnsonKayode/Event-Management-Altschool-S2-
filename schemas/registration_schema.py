@@ -8,3 +8,4 @@ class Registration(BaseModel):
     event_id: int
     registration_date: int
     attended: bool = False
+
