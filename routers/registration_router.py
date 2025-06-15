@@ -19,7 +19,7 @@ async def register_user_for_event(user_id: int, registration: Registration):
 
     # check if user exissts
     user = user_db.get(user_id)
-    if not user:
+    if not user or user == 0:
         raise HTTPException(status_code=404, detail="User not found")
     
     # check if user is active
@@ -61,21 +61,22 @@ async def register_user_for_event(user_id: int, registration: Registration):
 #         "detailss" : details
 #     }
 
-@registration_router.put("/registration/{user_id}/attendance")
+@registration_router.put("/registration/{user_id}/attendance", status_code=status.HTTP_200_OK)
 async def update_attendance(user_id: int):
     user = registration_db.get(user_id)
-    if not user:
+    if not user or user == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This user has not registered for any event")
 
-    user.attended = True
-    registration_db.update(user)
+    user["attended"] = True
+    registration_db[user_id] = user
     return {
         'message': 'User attendance successfully updated',
-        'user': user,
+        'user': user
     }
 
-
-# Mark attendance (set attended to True)
-# if usser exists in registered db
-
-# if user is in registered db for an event, change the attendance to True
+@registration_router.get("/registration/{user_id}", status_code=status.HTTP_202_ACCEPTED)
+async def get_user_info(user_id: int):
+    user = registration_db[user_id]
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return user

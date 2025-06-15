@@ -9,7 +9,7 @@ user_router = APIRouter()
 def get_all_users():
     return user_db
 
-@user_router.post("/user")
+@user_router.post("/user", status_code= status.HTTP_201_CREATED)
 def create_user(createUser: User):
     id = createUser.id = len(user_db) + 1
     details = createUser.model_dump()
@@ -20,7 +20,7 @@ def create_user(createUser: User):
     }
 
 
-@user_router.put("/user/{id}")
+@user_router.put("/user/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update_user(id: int, updateUser: Update_user):
     if id in user_db:
         details = user_db[id] = updateUser.model_dump()
@@ -31,7 +31,7 @@ def update_user(id: int, updateUser: Update_user):
     return f"User not found", status.HTTP_404_NOT_FOUND
 
 
-@user_router.put("/User/{id}/status")
+@user_router.put("/User/{id}/status", status_code=status.HTTP_202_ACCEPTED)
 def update_user_status(id: int, updateStatus:User):
     if id in user_db:
         details = user_status = user_db[id]
