@@ -19,7 +19,7 @@ def create_event(createEvent: Event):
         'details': details
     }
 
-@event_router.put("/event/{id}")
+@event_router.put("/event/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update_event(id: int, updateEvent: Update_Event):
     if id in event_db:
         existing_event = event_db.get(id)  # Get the current event details
