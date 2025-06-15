@@ -5,11 +5,11 @@ from schemas.event_schema import Event, Update_Event
 
 event_router = APIRouter()
 
-@event_router.get("/event")
+@event_router.get("/event", status_code=status.HTTP_202_ACCEPTED)
 def get_all_event():
     return event_db
 
-@event_router.post("/event")
+@event_router.post("/event", status_code=status.HTTP_201_CREATED)
 def create_event(createEvent: Event):
     id = createEvent.id = len(event_db) + 1
     details = createEvent.model_dump()
@@ -45,7 +45,7 @@ def update_event(id: int, updateEvent: Update_Event):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
 
 
-@event_router.put("/event/{id}/status")
+@event_router.put("/event/{id}/status", status_code=status.HTTP_200_OK)
 async def update_event_status(id: int, updateStatus: Update_Event):
     if id in event_db:
         details = event_db[id] 
@@ -57,7 +57,7 @@ async def update_event_status(id: int, updateStatus: Update_Event):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@event_router.delete("/event")
+@event_router.delete("/event", status_code=status.HTTP_204_NO_CONTENT)
 def delete_event(id:int):
     if id in event_db:
         details = event_db.pop(id)

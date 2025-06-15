@@ -6,12 +6,12 @@ from schemas.speaker_schema import Create_speaker, Update_speaker
 speaker_router = APIRouter()
 
 
-@speaker_router.get("/speaker")
+@speaker_router.get("/speaker", status_code=status.HTTP_200_OK)
 def get_all_speakers():
     return speaker_db
 
 
-@speaker_router.post("/speaker")
+@speaker_router.post("/speaker", status_code=status.HTTP_201_CREATED)
 def create_speaker(created_speaker: Create_speaker):
     id = created_speaker.id = len(speaker_db) + 1
     details = created_speaker.model_dump()
@@ -21,7 +21,7 @@ def create_speaker(created_speaker: Create_speaker):
         'Details': details}
 
 
-@speaker_router.put("/speaker/{id}")
+@speaker_router.put("/speaker/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update_speaker(id: int, update_a_speaker_details: Update_speaker):
     if id in speaker_db:
         details = speaker_db[id] = update_a_speaker_details.model_dump()
@@ -33,7 +33,7 @@ def update_speaker(id: int, update_a_speaker_details: Update_speaker):
 
 
 
-@speaker_router.delete("/speaker/{id}")
+@speaker_router.delete("/speaker/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def del_speaker(id: int):
     if id in speaker_db:
        del_speaker = speaker_db.pop(id)

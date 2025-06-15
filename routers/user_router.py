@@ -5,7 +5,7 @@ from database import user_db
 
 user_router = APIRouter()
 
-@user_router.get("/user")
+@user_router.get("/user", status_code=status.HTTP_202_ACCEPTED)
 def get_all_users():
     return user_db
 
@@ -43,7 +43,7 @@ def update_user_status(id: int, updateStatus:User):
     return f"User Id not found", status.HTTP_404_NOT_FOUND
 
 
-@user_router.delete("/user/{id}")
+@user_router.delete("/user/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(id:int):
     if id in user_db:
         details = user_db.pop(id)
