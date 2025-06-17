@@ -1,4 +1,5 @@
 from fastapi import HTTPException, FastAPI, APIRouter, status
+from uuid import UUID
 from database import event_db, user_db, registration_db, speaker_db
 from schemas.event_schema import Event, Update_Event
 
@@ -11,7 +12,8 @@ def get_all_event():
 
 @event_router.post("/event", status_code=status.HTTP_201_CREATED)
 def create_event(createEvent: Event):
-    id = createEvent.id = len(event_db) + 1
+    # id = createEvent.id = len(event_db) + 1
+    id = createEvent.id = id=str(UUID(int=len(event_db) + 1))
     details = createEvent.model_dump()
     event_db.update({id: details})
     return {
@@ -20,7 +22,7 @@ def create_event(createEvent: Event):
     }
 
 @event_router.put("/event/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update_event(id: int, updateEvent: Update_Event):
+def update_event(id: UUID, updateEvent: Update_Event):
     if id in event_db:
         existing_event = event_db.get(id)  # Get the current event details
         # updateEvent.model_dump(exclude_unset=True)
@@ -46,7 +48,7 @@ def update_event(id: int, updateEvent: Update_Event):
 
 
 @event_router.put("/event/{id}/status", status_code=status.HTTP_200_OK)
-async def update_event_status(id: int, updateStatus: Update_Event):
+async def update_event_status(id: UUID, updateStatus: Update_Event):
     if id in event_db:
         details = event_db[id] 
         details["is_open"] = updateStatus.is_open
@@ -58,7 +60,7 @@ async def update_event_status(id: int, updateStatus: Update_Event):
 
 
 @event_router.delete("/event", status_code=status.HTTP_204_NO_CONTENT)
-def delete_event(id:int):
+def delete_event(id:UUID):
     if id in event_db:
         details = event_db.pop(id)
         return {

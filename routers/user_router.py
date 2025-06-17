@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, status, APIRouter
 from schemas.user_schema import Create_user, Update_user, User
 from database import user_db
+from uuid import UUID
 
 
 user_router = APIRouter()
@@ -11,7 +12,8 @@ def get_all_users():
 
 @user_router.post("/user", status_code= status.HTTP_201_CREATED)
 def create_user(createUser: User):
-    id = createUser.id = len(user_db) + 1
+    id = createUser.id = str(UUID(int=len(user_db) + 1))
+    # id = createUser.id = len(user_db) + 1
     details = createUser.model_dump()
     user_db.update({id: details})
     return {
@@ -21,7 +23,7 @@ def create_user(createUser: User):
 
 
 @user_router.put("/user/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update_user(id: int, updateUser: Update_user):
+def update_user(id: UUID, updateUser: Update_user):
     if id in user_db:
         details = user_db[id] = updateUser.model_dump()
         return {
@@ -32,7 +34,7 @@ def update_user(id: int, updateUser: Update_user):
 
 
 @user_router.put("/User/{id}/status", status_code=status.HTTP_202_ACCEPTED)
-def update_user_status(id: int, updateStatus:User):
+def update_user_status(id: UUID, updateStatus:User):
     if id in user_db:
         details = user_status = user_db[id]
         user_status["is_active"] = updateStatus.is_active
@@ -44,7 +46,7 @@ def update_user_status(id: int, updateStatus:User):
 
 
 @user_router.delete("/user/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id:int):
+def delete_user(id:UUID):
     if id in user_db:
         details = user_db.pop(id)
         return {

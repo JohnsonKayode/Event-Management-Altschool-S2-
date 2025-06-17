@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException, status
+from uuid import UUID
 from database import user_db, registration_db, event_db, speaker_db
 from schemas.registration_schema import Registration, Attendance
 
@@ -13,9 +14,10 @@ def get_all_registered_user():
     return registration_db
 
 @registration_router.post("/registration/{user_id}", status_code=status.HTTP_201_CREATED)
-async def register_user_for_event(user_id: int, registration: Registration):
+async def register_user_for_event(user_id: UUID, registration: Registration):
 
-    registration_id = registration.id = len(registration_db) + 1
+    # registration_id = registration.id = len(registration_db) + 1
+    registration_id = registration.id = str(UUID(int=len(registration_db) + 1))
 
     # check if user exissts
     user = user_db.get(user_id)
@@ -62,7 +64,7 @@ async def register_user_for_event(user_id: int, registration: Registration):
 #     }
 
 @registration_router.put("/registration/{user_id}/attendance", status_code=status.HTTP_200_OK)
-async def update_attendance(user_id: int):
+async def update_attendance(user_id: UUID):
     user = registration_db.get(user_id)
     if not user or user == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This user has not registered for any event")
@@ -75,7 +77,7 @@ async def update_attendance(user_id: int):
     }
 
 @registration_router.get("/registration/{user_id}", status_code=status.HTTP_202_ACCEPTED)
-async def get_user_info(user_id: int):
+async def get_user_info(user_id: UUID):
     user = registration_db[user_id]
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
