@@ -1,4 +1,25 @@
-# dictionnary databasee for user
+import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+
+
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:123456789@localhost:9090/main_duplicate"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# print(SessionLocal)
+# print("\n 'Database session initialized' \n")
+
+Base = declarative_base()
+
+# db = SessionLocal()
+# db.execute(text("CREATE DATABASE main_duplicate"))
+# db.close()
 
 user_db = {}
 

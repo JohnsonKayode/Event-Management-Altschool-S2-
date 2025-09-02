@@ -3,7 +3,9 @@ from fastapi import FastAPI, HTTPException, status
 from routers.user_router import user_router
 from routers.event_router import event_router
 from routers.registration_router import registration_router
+from database import SessionLocal, Base, engine
 
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 

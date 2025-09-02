@@ -1,19 +1,22 @@
 from pydantic import BaseModel
 from typing import Annotated, Union, Optional
+from uuid import UUID
 
 
-class User(BaseModel):
-    id: int
+class UserBase(BaseModel):
     name: str
     email: str
     is_active: bool = True 
 
-class Create_user(BaseModel):
-    id: int
-    name: str
-    email: str
+class User(UserBase):
+    id: UUID
 
-class Update_user(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
+class UserCreate(UserBase):
+    pass
 
+class UserUpdate(BaseModel):
+    name: str = None
+    email: str = None
+
+class UserStatusUpdate(BaseModel):
+    is_active: bool

@@ -1,56 +1,47 @@
-from fastapi import FastAPI, HTTPException, status, APIRouter
-from schemas.user_schema import Create_user, Update_user, User
-from database import user_db
+from fastapi import status, APIRouter, Depends
+from schemas.user_schema import UserCreate, UserUpdate, UserStatusUpdate 
+from database import SessionLocal, Base, engine
+from sqlalchemy.orm import Session
 from uuid import UUID
+from services.user import user_services
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+Base.metadata.create_all(bind=engine)
 
 user_router = APIRouter()
 
 @user_router.get("/user", status_code=status.HTTP_202_ACCEPTED)
-def get_all_users():
-    return user_db
+def get_all_users(user_db: Session = Depends(get_db)):
+    users = user_services.get_all_users(user_db)
+    return users
+
+@user_router.get("/user/{user_id}", status_code=status.HTTP_200_OK)
+def get_user_by_id(user_id: UUID, user_db: Session = Depends(get_db)):
+    user = user_services.get_user_by_id(user_db, user_id)
+    return user
 
 @user_router.post("/user", status_code= status.HTTP_201_CREATED)
-def create_user(createUser: User):
-    id = createUser.id = str(UUID(int=len(user_db) + 1))
-    # id = createUser.id = len(user_db) + 1
-    details = createUser.model_dump()
-    user_db.update({id: details})
-    return {
-        'message': 'User Created Successfully',
-        'details': details
-    }
+def create_user(createUser: UserCreate, user_db: Session = Depends(get_db)):
+    users = user_services.create_user(user_db, createUser)
+    return users
 
+@user_router.patch("/user/{user_id}", status_code=status.HTTP_202_ACCEPTED)
+def update_user(user_id: UUID, updateUser: UserUpdate, user_db: Session = Depends(get_db)):
+    user = user_services.update_user(user_db, user_id, updateUser)
+    return user
 
-@user_router.put("/user/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update_user(id: UUID, updateUser: Update_user):
-    if id in user_db:
-        details = user_db[id] = updateUser.model_dump()
-        return {
-            'message': 'user updated successfully',
-            'details' : details
-        }
-    return f"User not found", status.HTTP_404_NOT_FOUND
+@user_router.patch("/user/{user_id}/status", status_code=status.HTTP_202_ACCEPTED)
+def update_user_status(user_id: UUID, updateStatus: UserStatusUpdate, user_db: Session = Depends(get_db)):
+    user = user_services.update_user_status(user_db, user_id, updateStatus)
+    return user
 
-
-@user_router.put("/User/{id}/status", status_code=status.HTTP_202_ACCEPTED)
-def update_user_status(id: UUID, updateStatus:User):
-    if id in user_db:
-        details = user_status = user_db[id]
-        user_status["is_active"] = updateStatus.is_active
-        return {
-            'message': 'Status updated sucessfullly',
-            'details': details
-        }
-    return f"User Id not found", status.HTTP_404_NOT_FOUND
-
-
-@user_router.delete("/user/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id:UUID):
-    if id in user_db:
-        details = user_db.pop(id)
-        return {
-            'message': 'user deleted successfully',
-            'details': details
-        }
-    return f"This user does not exist, enter a valid user ID", status.HTTP_404_NOT_FOUND
+@user_router.delete("/user/{user_id}", status_code=status.HTTP_200_OK)
+def delete_user(user_id: UUID, user_db: Session = Depends(get_db)):
+    user = user_services.delete_user(user_db, user_id)
+    return user
