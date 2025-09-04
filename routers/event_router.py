@@ -1,71 +1,52 @@
-from fastapi import HTTPException, FastAPI, APIRouter, status
+from fastapi import APIRouter, status, Depends
 from uuid import UUID
-from database import event_db, user_db, registration_db, speaker_db
-from schemas.event_schema import Event, Update_Event
+from database import SessionLocal, Base, engine
+from sqlalchemy.orm import Session
+from schemas.event_schema import EventCreate, UpdateEvent, EventStatusUpdate, EventBase
+from services.event import event_services
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
+Base.metadata.create_all(bind=engine)
+print("Tables created successfully!")
 
 event_router = APIRouter()
 
 @event_router.get("/event", status_code=status.HTTP_202_ACCEPTED)
-def get_all_event():
-    return event_db
+def get_all_event(event_db: Session = Depends(get_db)):
+    event = event_services.get_all_event(event_db)
+    return event
+
+@event_router.get("/event/{event_id}", status_code=status.HTTP_200_OK)
+def get_event_by_id(event_id: UUID, event_db: Session = Depends(get_db)):
+    event = event_services.get_event_by_id(event_db, event_id)
+    return event
 
 @event_router.post("/event", status_code=status.HTTP_201_CREATED)
-def create_event(createEvent: Event):
-    # id = createEvent.id = len(event_db) + 1
-    id = createEvent.id = id=str(UUID(int=len(event_db) + 1))
-    details = createEvent.model_dump()
-    event_db.update({id: details})
+def create_event(createEvent: EventCreate, event_db: Session = Depends(get_db)):
+    details = event_services.create_event(event_db, createEvent)
+    return details
+
+@event_router.patch("/event/{event_id}", status_code=status.HTTP_202_ACCEPTED)
+def update_event(event_id: UUID, updateEvent: UpdateEvent, event_db: Session = Depends(get_db)):
+    event = event_services.update_event(event_db, event_id, updateEvent)
+    return event
+
+@event_router.patch("/event/{event_id}/status", status_code=status.HTTP_200_OK)
+def update_event_status(event_id: UUID, updateStatus: EventStatusUpdate, event_db : Session = Depends(get_db)):
+    details = event_services.update_event_status(event_db, event_id, updateStatus)
     return {
-        'message': 'Event Created Successfully',
-        'details': details
+        "message" : "Status updated Successfully",
+        'details' : details
     }
 
-@event_router.put("/event/{id}", status_code=status.HTTP_202_ACCEPTED)
-def update_event(id: UUID, updateEvent: Update_Event):
-    if id in event_db:
-        existing_event = event_db.get(id)  # Get the current event details
-        # updateEvent.model_dump(exclude_unset=True)
-        if updateEvent.title is not None:
-            existing_event["title"] = updateEvent.title
-        if updateEvent.location is not None:
-            existing_event["location"] = updateEvent.location
-        if updateEvent.date is not None:
-            existing_event["date"] = updateEvent.date
-        if updateEvent.is_open is not None:
-            existing_event["is_open"] = updateEvent.is_open
 
-        event_db.update(updateEvent)
-
-        # updated_data = updateEvent.model_dump()  # Only include fields provided in the request
-        # existing_event.update(updated_data)  # Update only the provided fields
-        # event_db[id]= existing_event  # Save the updated event back to the database
-        return {
-            'message': 'Event updated successfully',
-            'details': existing_event
-        }
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
-
-
-@event_router.patch("/event/{id}/status", status_code=status.HTTP_200_OK)
-async def update_event_status(id: UUID, updateStatus: Update_Event):
-    if id in event_db:
-        details = event_db[id] 
-        details["is_open"] = updateStatus.is_open
-        return {
-            "message" : "Status updated Successfully",
-            'details' : details
-        }
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-
-@event_router.delete("/event", status_code=status.HTTP_202_ACCEPTED)
-def delete_event(id:UUID):
-    if id in event_db:
-        details = event_db.pop(id)
-        return {
-            "message": 'Successfully deleted event',
-            'details' : details
-        }
-    return f"This event does not eexist", status.HTTP_404_NOT_FOUND
+@event_router.delete("/event/{event_id}", status_code=status.HTTP_200_OK)
+def delete_event(event_id:UUID, event_db: Session = Depends(get_db)):
+    details = event_services.delete_event(event_db, event_id)
+    return details

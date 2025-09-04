@@ -2,26 +2,26 @@ import uuid
 from schemas.user_schema import UserCreate, UserUpdate, User, UserStatusUpdate, UserBase
 from database import user_db
 from uuid import UUID
-from model import User
+from model import UserT
 from sqlalchemy.orm import Session
 from fastapi import status
 
 class UserServices:
     @staticmethod
     def get_all_users(user_db: Session):
-        user  = user_db.query(User).all()
+        user = user_db.query(UserT).all()
         return user
     
     @staticmethod
     def get_user_by_id(user_db: Session, user_id: UUID):
-        user = user_db.query(User).filter(User.id == str(user_id)).first()
+        user = user_db.query(UserT).filter(UserT.id == str(user_id)).first()
         if user:
             return user
         return f"User not found", status.HTTP_404_NOT_FOUND
 
     @staticmethod
     def create_user(user_db: Session, createUser: UserCreate):
-        user = User(id=str(uuid.uuid4()), **createUser.model_dump())
+        user = UserT(id=str(uuid.uuid4()), **createUser.model_dump())
         user_db.add(user)
         user_db.commit()
         user_db.refresh(user)
@@ -48,7 +48,7 @@ class UserServices:
 
     @staticmethod
     def update_user_status(user_db: Session, user_id: UUID, updateStatus: UserStatusUpdate):
-        user = user_db.query(User).filter(User.id == str(user_id)).first()
+        user = user_db.query(UserT).filter(UserT.id == str(user_id)).first()
         if user:
             user.is_active = updateStatus.is_active
             user_db.commit()
@@ -62,7 +62,7 @@ class UserServices:
 
     @staticmethod
     def delete_user(user_db: Session, user_id:UUID):
-        user = user_db.query(User).filter(User.id == str(user_id)).first()
+        user = user_db.query(UserT).filter(UserT.id == str(user_id)).first()
         if user:
             user_db.delete(user)
             user_db.commit()

@@ -1,15 +1,24 @@
 from pydantic import BaseModel
 from typing import Annotated, Union, Optional
+from uuid import UUID
 
-class Event(BaseModel):
-    id: int
+
+class EventBase(BaseModel):
     title: str
     location: str
-    date: Annotated[Union[str, int], "Date can be a string or an integer"] = 0
+    date: str
     is_open: bool = True
 
-class Update_Event(BaseModel):
-    title: Optional[str] = None
-    location: Optional[str] = None
-    date: Optional[Annotated[Union[str, int], "Date can be a string or an integer"]] = 0
-    is_open: bool = True
+class Event(EventBase):
+    id: UUID
+
+class EventCreate(EventBase):
+    pass
+
+class UpdateEvent(BaseModel):
+    title: str = None
+    location: str = None
+    date: str = None
+
+class EventStatusUpdate(BaseModel):
+    is_open: bool
